@@ -283,3 +283,4 @@ document.addEventListener("DOMContentLoaded", () => {
     modalRestartBtn.addEventListener("click", restartGame);
   }
 });
+
