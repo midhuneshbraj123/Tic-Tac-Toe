@@ -282,34 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-const playerScoreEl = document.getElementById('playerScore');
-const drawScoreEl = document.getElementById('drawScore');
-const botScoreEl = document.getElementById('botScore');
-const difficultySelect = document.getElementById('difficulty');
-const resetScoresBtn = document.getElementById('resetScoresBtn');
-
-// --- Score State (persisted via localStorage) ---
-let scores = JSON.parse(localStorage.getItem('tictactoe_scores')) || { player: 0, draw: 0, bot: 0 };
-
-function updateScoreDisplay() {
-  playerScoreEl.textContent = scores.player;
-  drawScoreEl.textContent = scores.draw;
-  botScoreEl.textContent = scores.bot;
-  localStorage.setItem('tictactoe_scores', JSON.stringify(scores));
-}
-
-// Initialize scores on load
-updateScoreDisplay();
-
-// Reset Scores Handler
-if (resetScoresBtn) {
-  resetScoresBtn.addEventListener('click', () => {
-    scores = { player: 0, draw: 0, bot: 0 };
-    updateScoreDisplay();
-  });
-}
-
-// --- Computer AI Decision ---
 function botTurn() {
   const emptyIndices = board
     .map((val, idx) => (val === "" ? idx : null))
@@ -324,10 +296,9 @@ function botTurn() {
     // Random move
     move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
   } else {
-    // Smart move: 1. Try to win, 2. Block player, 3. Take center/corner, 4. Random
-    move = findBestMove('O'); // Check if bot can win
-    if (move === -1) move = findBestMove('X'); // Check if player needs blocking
-    if (move === -1 && board[4] === "") move = 4; // Take center
+    move = findBestMove('O'); 
+    if (move === -1) move = findBestMove('X');
+    if (move === -1 && board[4] === "") move = 4; 
     if (move === -1) {
       const corners = [0, 2, 6, 8].filter(i => board[i] === "");
       if (corners.length > 0) move = corners[Math.floor(Math.random() * corners.length)];
@@ -338,7 +309,6 @@ function botTurn() {
   makeMove(move, "O");
 }
 
-// Helper to find immediate win or block opportunity
 function findBestMove(playerSymbol) {
   for (let i = 0; i < winPatterns.length; i++) {
     const [a, b, c] = winPatterns[i];
@@ -352,7 +322,6 @@ function findBestMove(playerSymbol) {
   return -1;
 }
 
-// --- Update Result Handler to modify scores ---
 function showResult(text, outcome) {
   if (statusText) statusText.textContent = text;
   if (modal) {
