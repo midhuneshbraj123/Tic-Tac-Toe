@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  // --- 1. SIMPLE BACKGROUND SPACE ANIMATION ---
   var canvas = document.getElementById("spaceCanvas");
   var ctx = canvas.getContext("2d");
 
@@ -11,7 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  // Create simple comet objects
   var comets = [];
   for (var i = 0; i < 4; i++) {
     comets.push(resetComet({}));
@@ -29,15 +27,12 @@ document.addEventListener("DOMContentLoaded", function () {
   function drawSpace() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw and move each comet
     for (var i = 0; i < comets.length; i++) {
       var c = comets[i];
 
-      // Move comet down and to the right
       c.x = c.x + c.speedX;
       c.y = c.y + c.speedY;
 
-      // Draw comet tail gradient
       var gradient = ctx.createLinearGradient(c.x, c.y, c.x - c.length, c.y - c.length);
       gradient.addColorStop(0, "rgba(56, 189, 248, 1)");
       gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
@@ -49,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      // Reset comet if it goes off screen
       if (c.y > canvas.height + 100 || c.x > canvas.width + 100) {
         resetComet(c);
       }
@@ -60,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
   drawSpace();
 
 
-  // --- 2. GAME LOGIC ---
   var board = ["", "", "", "", "", "", "", "", ""];
   var gameActive = true;
 
@@ -213,111 +206,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
+function makeMove(index, player) {
+  board[index] = player;
+  cells[index].textContent = player;
 
-  // --- 1. CONFETTI CANVAS LOGIC ---
-  var confettiCanvas = document.getElementById("confettiCanvas");
-  var confettiCtx = confettiCanvas.getContext("2d");
-  var confettiList = [];
-
-  function resizeConfetti() {
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
-  }
-  window.addEventListener("resize", resizeConfetti);
-  resizeConfetti();
-
-  function triggerWinConfetti() {
-    confettiList = [];
-    var colors = ["#38bdf8", "#ec4899", "#facc15", "#4ade80", "#a855f7"];
-
-    // Spawn 80 simple falling pieces
-    for (var i = 0; i < 80; i++) {
-      confettiList.push({
-        x: confettiCanvas.width / 2,
-        y: confettiCanvas.height / 2,
-        speedX: (Math.random() - 0.5) * 12,
-        speedY: (Math.random() - 0.5) * 12 - 4,
-        size: Math.random() * 8 + 4,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        gravity: 0.25,
-        opacity: 1
-      });
-    }
+  if (player === "X") {
+    cells[index].style.color = "#38bdf8";
+    cells[index].style.textShadow = "0 0 10px #38bdf8, 0 0 20px #38bdf8";
+  } else {
+    cells[index].style.color = "#ec4899";
+    cells[index].style.textShadow = "0 0 10px #ec4899, 0 0 20px #ec4899";
   }
 
-  function drawConfetti() {
-    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-
-    for (var i = 0; i < confettiList.length; i++) {
-      var p = confettiList[i];
-
-      p.x += p.speedX;
-      p.y += p.speedY;
-      p.speedY += p.gravity; // Gravity pulls pieces down
-      p.opacity -= 0.015;   // Fades out smoothly
-
-      if (p.opacity > 0) {
-        confettiCtx.fillStyle = p.color;
-        confettiCtx.globalAlpha = p.opacity;
-        confettiCtx.fillRect(p.x, p.y, p.size, p.size);
-      }
-    }
-
-    requestAnimationFrame(drawConfetti);
-  }
-  drawConfetti();
-
-
-  // --- 2. GAME LOGIC INTEGRATION ---
-  // (In your checkWinner function, call triggerWinConfetti when Player X wins)
-
-  function checkWinner() {
-    var won = false;
-    var winningPlayer = "";
-
-    for (var i = 0; i < winConditions.length; i++) {
-      var condition = winConditions[i];
-      var cellA = board[condition[0]];
-      var cellB = board[condition[1]];
-      var cellC = board[condition[2]];
-
-      if (cellA !== "" && cellA === cellB && cellB === cellC) {
-        won = true;
-        winningPlayer = cellA;
-        break;
-      }
-    }
-
-    if (won) {
-      gameActive = false;
-      if (winningPlayer === "X") {
-        statusText.textContent = "You Won!";
-        pScore++;
-        playerScoreEl.textContent = pScore;
-        triggerWinConfetti(); // <--- CONFETTI BURST CALL HERE
-      } else {
-        statusText.textContent = "Computer Won!";
-        bScore++;
-        botScoreEl.textContent = bScore;
-      }
-      return;
-    }
-
-    var isDraw = true;
-    for (var k = 0; k < board.length; k++) {
-      if (board[k] === "") {
-        isDraw = false;
-        break;
-      }
-    }
-
-    if (isDraw) {
-      gameActive = false;
-      statusText.textContent = "It's a Draw!";
-      dScore++;
-      drawScoreEl.textContent = dScore;
-    }
-  }
-
-});
+  checkWinner();
+}
