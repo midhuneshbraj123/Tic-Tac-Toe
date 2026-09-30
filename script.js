@@ -1,344 +1,323 @@
-document.addEventListener("DOMContentLoaded", () => {
-  let board = ["", "", "", "", "", "", "", "", ""];
-  let humanPlayer = "X";
-  let aiPlayer = "O";
-  let isGameActive = true;
+document.addEventListener("DOMContentLoaded", function () {
 
-  const cells = document.querySelectorAll(".cell");
-  const restartBtn = document.getElementById("restartButton");
-  const winnerModal = document.getElementById("winnerModal");
-  const winnerText = document.getElementById("winnerText");
-  const modalRestartBtn = document.getElementById("modalRestartBtn");
+  // --- 1. SIMPLE BACKGROUND SPACE ANIMATION ---
+  var canvas = document.getElementById("spaceCanvas");
+  var ctx = canvas.getContext("2d");
 
-  const winningConditions = [
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  // Create simple comet objects
+  var comets = [];
+  for (var i = 0; i < 4; i++) {
+    comets.push(resetComet({}));
+  }
+
+  function resetComet(comet) {
+    comet.x = Math.random() * canvas.width;
+    comet.y = Math.random() * -100;
+    comet.speedX = 3 + Math.random() * 2;
+    comet.speedY = 3 + Math.random() * 2;
+    comet.length = 60 + Math.random() * 40;
+    return comet;
+  }
+
+  function drawSpace() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw and move each comet
+    for (var i = 0; i < comets.length; i++) {
+      var c = comets[i];
+
+      // Move comet down and to the right
+      c.x = c.x + c.speedX;
+      c.y = c.y + c.speedY;
+
+      // Draw comet tail gradient
+      var gradient = ctx.createLinearGradient(c.x, c.y, c.x - c.length, c.y - c.length);
+      gradient.addColorStop(0, "rgba(56, 189, 248, 1)");
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+      ctx.beginPath();
+      ctx.moveTo(c.x, c.y);
+      ctx.lineTo(c.x - c.length, c.y - c.length);
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Reset comet if it goes off screen
+      if (c.y > canvas.height + 100 || c.x > canvas.width + 100) {
+        resetComet(c);
+      }
+    }
+
+    requestAnimationFrame(drawSpace);
+  }
+  drawSpace();
+
+
+  // --- 2. GAME LOGIC ---
+  var board = ["", "", "", "", "", "", "", "", ""];
+  var gameActive = true;
+
+  var pScore = 0;
+  var dScore = 0;
+  var bScore = 0;
+
+  var cells = document.querySelectorAll(".cell");
+  var statusText = document.getElementById("status");
+  var restartBtn = document.getElementById("restartBtn");
+  var difficultySelect = document.getElementById("difficulty");
+
+  var playerScoreEl = document.getElementById("playerScore");
+  var drawScoreEl = document.getElementById("drawScore");
+  var botScoreEl = document.getElementById("botScore");
+
+  var winConditions = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8],
     [0, 3, 6], [1, 4, 7], [2, 5, 8],
     [0, 4, 8], [2, 4, 6]
   ];
 
-  function launchCanvasEmojiBurst(emojiList) {
-    const canvas = document.getElementById("spaceCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+  for (var j = 0; j < cells.length; j++) {
+    cells[j].addEventListener("click", handleCellClick);
+  }
 
-    const particles = [];
-    const particleCount = 28;
-    const startX = canvas.width / 2;
-    const startY = canvas.height / 2;
+  restartBtn.addEventListener("click", resetGame);
 
-    for (let i = 0; i < particleCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 5 + 4;
-      particles.push({
-        x: startX,
-        y: startY,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 1.5,
-        emoji: emojiList[Math.floor(Math.random() * emojiList.length)],
-        size: Math.random() * 16 + 30,
-        alpha: 1,
-        gravity: 0.08
-      });
-    }
+  function handleCellClick(e) {
+    var index = parseInt(e.target.getAttribute("data-index"), 10);
 
-    function animateEmojis() {
-      let active = false;
+    if (board[index] === "" && gameActive) {
+      makeMove(index, "X");
 
-      particles.forEach(p => {
-        if (p.alpha <= 0) return;
-
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += p.gravity;
-        p.alpha -= 0.02;
-
-        if (p.alpha > 0) {
-          active = true;
-          ctx.save();
-          ctx.globalAlpha = Math.max(0, p.alpha);
-          ctx.font = `${p.size}px sans-serif`;
-          ctx.fillText(p.emoji, p.x, p.y);
-          ctx.restore();
-        }
-      });
-
-      if (active) {
-        requestAnimationFrame(animateEmojis);
+      if (gameActive) {
+        setTimeout(botMove, 250);
       }
-    }
-
-    animateEmojis();
-  }
-
-  function launchHappyEmojis() {
-    launchCanvasEmojiBurst(["🥳", "🎉", "⭐", "😎", "🔥", "👑"]);
-  }
-
-  function launchSadEmojis() {
-    launchCanvasEmojiBurst(["😢", "😭", "💔", "😞", "🌧️"]);
-  }
-
-  function launchDrawEmojis() {
-    launchCanvasEmojiBurst(["🤝", "😐", "⚔️", "⚖️", "🤔", "🤷"]);
-  }
-
-  const canvas = document.getElementById("spaceCanvas");
-  if (canvas) {
-    const ctx = canvas.getContext("2d");
-    let width, height;
-
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resize);
-    resize();
-
-    const comets = [];
-    const maxComets = 8;
-
-    function createComet() {
-      return {
-        x: Math.random() * width * 1.3,
-        y: Math.random() * -height * 0.3,
-        length: Math.random() * 100 + 50,
-        speed: Math.random() * 5 + 3,
-        angle: Math.PI / 4,
-        opacity: Math.random() * 0.8 + 0.2,
-        size: Math.random() * 2 + 1
-      };
-    }
-
-    for (let i = 0; i < maxComets; i++) {
-      comets.push(createComet());
-    }
-
-    function drawScene() {
-      ctx.clearRect(0, 0, width, height);
-
-      comets.forEach((comet) => {
-        comet.x -= Math.cos(comet.angle) * comet.speed;
-        comet.y += Math.sin(comet.angle) * comet.speed;
-
-        const tailX = comet.x + Math.cos(comet.angle) * comet.length;
-        const tailY = comet.y - Math.sin(comet.angle) * comet.length;
-
-        const cometGradient = ctx.createLinearGradient(comet.x, comet.y, tailX, tailY);
-        cometGradient.addColorStop(0, `rgba(192, 132, 252, ${comet.opacity})`);
-        cometGradient.addColorStop(0.4, `rgba(129, 140, 248, ${comet.opacity * 0.6})`);
-        cometGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-
-        ctx.beginPath();
-        ctx.moveTo(comet.x, comet.y);
-        ctx.lineTo(tailX, tailY);
-        ctx.strokeStyle = cometGradient;
-        ctx.lineWidth = comet.size;
-        ctx.lineCap = "round";
-        ctx.stroke();
-
-        if (comet.y > height + 100 || comet.x < -100) {
-          Object.assign(comet, createComet());
-        }
-      });
-
-      requestAnimationFrame(drawScene);
-    }
-
-    drawScene();
-  }
-
-  // --- Game Flow & Cell Handling ---
-  function handleCellClick(event) {
-    const index = parseInt(event.target.getAttribute("data-index"));
-
-    if (board[index] !== "" || !isGameActive) return;
-
-    makeMove(index, humanPlayer);
-
-    if (isGameActive) {
-      setTimeout(computerTurn, 350);
     }
   }
 
   function makeMove(index, player) {
     board[index] = player;
     cells[index].textContent = player;
-    cells[index].style.color = player === "X" ? "#818cf8" : "#ec4899";
+    cells[index].style.color = player === "X" ? "#38bdf8" : "#ec4899";
 
-    const winner = checkWinner(board);
-    if (winner) {
-      endGame(winner);
-    }
+    checkWinner();
   }
 
-  function computerTurn() {
-    if (!isGameActive) return;
-
-    const emptyIndexes = [];
-    board.forEach((val, idx) => {
-      if (val === "") emptyIndexes.push(idx);
-    });
-
-    if (emptyIndexes.length === 0) return;
-
-    let chosenMove = findWinningMove(aiPlayer);
-
-    if (chosenMove === -1) {
-      chosenMove = findWinningMove(humanPlayer);
-    }
-
-    if (chosenMove === -1) {
-      if (Math.random() < 0.6) {
-        const preferredSpots = [4, 0, 2, 6, 8].filter(idx => board[idx] === "");
-        if (preferredSpots.length > 0) {
-          chosenMove = preferredSpots[Math.floor(Math.random() * preferredSpots.length)];
-        }
+  function botMove() {
+    var emptyCells = [];
+    for (var i = 0; i < board.length; i++) {
+      if (board[i] === "") {
+        emptyCells.push(i);
       }
     }
 
-    if (chosenMove === -1) {
-      chosenMove = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)];
+    if (emptyCells.length === 0 || !gameActive) {
+      return;
     }
 
-    makeMove(chosenMove, aiPlayer);
+    var mode = difficultySelect.value;
+    var chosenIndex = -1;
+
+    if (mode === "hard") {
+      chosenIndex = findWinningSpot("O");
+      if (chosenIndex === -1) {
+        chosenIndex = findWinningSpot("X");
+      }
+      if (chosenIndex === -1 && board[4] === "") {
+        chosenIndex = 4;
+      }
+    }
+
+    if (chosenIndex === -1) {
+      var randomIndex = Math.floor(Math.random() * emptyCells.length);
+      chosenIndex = emptyCells[randomIndex];
+    }
+
+    makeMove(chosenIndex, "O");
   }
 
-  function findWinningMove(player) {
-    for (let condition of winningConditions) {
-      const [a, b, c] = condition;
-      const values = [board[a], board[b], board[c]];
-      if (values.filter(val => val === player).length === 2 && values.includes("")) {
-        if (board[a] === "") return a;
-        if (board[b] === "") return b;
-        if (board[c] === "") return c;
-      }
+  function findWinningSpot(player) {
+    for (var i = 0; i < winConditions.length; i++) {
+      var a = winConditions[i][0];
+      var b = winConditions[i][1];
+      var c = winConditions[i][2];
+
+      if (board[a] === player && board[b] === player && board[c] === "") return c;
+      if (board[a] === player && board[c] === player && board[b] === "") return b;
+      if (board[b] === player && board[c] === player && board[a] === "") return a;
     }
     return -1;
   }
 
-  function checkWinner(b) {
-    for (let condition of winningConditions) {
-      const [a, bIdx, c] = condition;
-      if (b[a] && b[a] === b[bIdx] && b[a] === b[c]) {
-        return b[a];
-      }
-    }
-    if (b.every(cell => cell !== "")) {
-      return "draw";
-    }
-    return null;
-  }
+  function checkWinner() {
+    var won = false;
+    var winningPlayer = "";
 
-  function endGame(winner) {
-    isGameActive = false;
+    for (var i = 0; i < winConditions.length; i++) {
+      var condition = winConditions[i];
+      var cellA = board[condition[0]];
+      var cellB = board[condition[1]];
+      var cellC = board[condition[2]];
 
-    if (winnerText) {
-      if (winner === humanPlayer) {
-        winnerText.textContent = "🏆 You Won!";
-        launchHappyEmojis();
-        if (typeof confetti === "function") {
-          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        }
-      } else if (winner === aiPlayer) {
-        winnerText.textContent = "🤖 Computer Won!";
-        launchSadEmojis();
-      } else if (winner === "draw") {
-        winnerText.textContent = "🤝 It's a Draw!";
-        launchDrawEmojis();
+      if (cellA !== "" && cellA === cellB && cellB === cellC) {
+        won = true;
+        winningPlayer = cellA;
+        break;
       }
     }
 
-    if (winnerModal) {
-      winnerModal.style.display = "flex";
-      winnerModal.classList.add("show");
+    if (won) {
+      gameActive = false;
+      if (winningPlayer === "X") {
+        statusText.textContent = "You Won!";
+        pScore++;
+        playerScoreEl.textContent = pScore;
+      } else {
+        statusText.textContent = "Computer Won!";
+        bScore++;
+        botScoreEl.textContent = bScore;
+      }
+      return;
+    }
+
+    var isDraw = true;
+    for (var k = 0; k < board.length; k++) {
+      if (board[k] === "") {
+        isDraw = false;
+        break;
+      }
+    }
+
+    if (isDraw) {
+      gameActive = false;
+      statusText.textContent = "It's a Draw!";
+      dScore++;
+      drawScoreEl.textContent = dScore;
     }
   }
 
-  function restartGame(e) {
-    if (e) e.stopPropagation();
-
+  function resetGame() {
     board = ["", "", "", "", "", "", "", "", ""];
-    isGameActive = true;
+    gameActive = true;
+    statusText.textContent = "";
 
-    if (winnerModal) {
-      winnerModal.style.display = "none";
-      winnerModal.classList.remove("show");
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].textContent = "";
     }
-
-    cells.forEach(cell => {
-      cell.textContent = "";
-      cell.style.color = "";
-    });
-  }
-
-  cells.forEach(cell => cell.addEventListener("click", handleCellClick));
-
-  if (restartBtn) {
-    restartBtn.addEventListener("click", restartGame);
-  }
-
-  if (modalRestartBtn) {
-    modalRestartBtn.addEventListener("click", restartGame);
   }
 });
 
-function botTurn() {
-  const emptyIndices = board
-    .map((val, idx) => (val === "" ? idx : null))
-    .filter((val) => val !== null);
+document.addEventListener("DOMContentLoaded", function () {
 
-  if (emptyIndices.length === 0 || !isGameActive) return;
+  // --- 1. CONFETTI CANVAS LOGIC ---
+  var confettiCanvas = document.getElementById("confettiCanvas");
+  var confettiCtx = confettiCanvas.getContext("2d");
+  var confettiList = [];
 
-  const difficulty = difficultySelect ? difficultySelect.value : 'easy';
-  let move;
-
-  if (difficulty === 'easy') {
-    // Random move
-    move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-  } else {
-    move = findBestMove('O'); 
-    if (move === -1) move = findBestMove('X');
-    if (move === -1 && board[4] === "") move = 4; 
-    if (move === -1) {
-      const corners = [0, 2, 6, 8].filter(i => board[i] === "");
-      if (corners.length > 0) move = corners[Math.floor(Math.random() * corners.length)];
-    }
-    if (move === -1) move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  function resizeConfetti() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
   }
+  window.addEventListener("resize", resizeConfetti);
+  resizeConfetti();
 
-  makeMove(move, "O");
-}
+  function triggerWinConfetti() {
+    confettiList = [];
+    var colors = ["#38bdf8", "#ec4899", "#facc15", "#4ade80", "#a855f7"];
 
-function findBestMove(playerSymbol) {
-  for (let i = 0; i < winPatterns.length; i++) {
-    const [a, b, c] = winPatterns[i];
-    const line = [board[a], board[b], board[c]];
-    if (line.filter(val => val === playerSymbol).length === 2 && line.includes("")) {
-      if (board[a] === "") return a;
-      if (board[b] === "") return b;
-      if (board[c] === "") return c;
+    // Spawn 80 simple falling pieces
+    for (var i = 0; i < 80; i++) {
+      confettiList.push({
+        x: confettiCanvas.width / 2,
+        y: confettiCanvas.height / 2,
+        speedX: (Math.random() - 0.5) * 12,
+        speedY: (Math.random() - 0.5) * 12 - 4,
+        size: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        gravity: 0.25,
+        opacity: 1
+      });
     }
   }
-  return -1;
-}
 
-function showResult(text, outcome) {
-  if (statusText) statusText.textContent = text;
-  if (modal) {
-    modal.style.display = "flex";
-    modal.classList.add("show");
+  function drawConfetti() {
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+    for (var i = 0; i < confettiList.length; i++) {
+      var p = confettiList[i];
+
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.speedY += p.gravity; // Gravity pulls pieces down
+      p.opacity -= 0.015;   // Fades out smoothly
+
+      if (p.opacity > 0) {
+        confettiCtx.fillStyle = p.color;
+        confettiCtx.globalAlpha = p.opacity;
+        confettiCtx.fillRect(p.x, p.y, p.size, p.size);
+      }
+    }
+
+    requestAnimationFrame(drawConfetti);
+  }
+  drawConfetti();
+
+
+  // --- 2. GAME LOGIC INTEGRATION ---
+  // (In your checkWinner function, call triggerWinConfetti when Player X wins)
+
+  function checkWinner() {
+    var won = false;
+    var winningPlayer = "";
+
+    for (var i = 0; i < winConditions.length; i++) {
+      var condition = winConditions[i];
+      var cellA = board[condition[0]];
+      var cellB = board[condition[1]];
+      var cellC = board[condition[2]];
+
+      if (cellA !== "" && cellA === cellB && cellB === cellC) {
+        won = true;
+        winningPlayer = cellA;
+        break;
+      }
+    }
+
+    if (won) {
+      gameActive = false;
+      if (winningPlayer === "X") {
+        statusText.textContent = "You Won!";
+        pScore++;
+        playerScoreEl.textContent = pScore;
+        triggerWinConfetti(); // <--- CONFETTI BURST CALL HERE
+      } else {
+        statusText.textContent = "Computer Won!";
+        bScore++;
+        botScoreEl.textContent = bScore;
+      }
+      return;
+    }
+
+    var isDraw = true;
+    for (var k = 0; k < board.length; k++) {
+      if (board[k] === "") {
+        isDraw = false;
+        break;
+      }
+    }
+
+    if (isDraw) {
+      gameActive = false;
+      statusText.textContent = "It's a Draw!";
+      dScore++;
+      drawScoreEl.textContent = dScore;
+    }
   }
 
-  if (outcome === "X") {
-    scores.player++;
-    popEmojis(["🥳", "🎉", "⭐", "🔥"]);
-  } else if (outcome === "O") {
-    scores.bot++;
-    popEmojis(["😢", "😭", "💔"]);
-  } else {
-    scores.draw++;
-    popEmojis(["🤝", "⚖️", "🤔"]);
-  }
-
-  updateScoreDisplay();
-}
+});
