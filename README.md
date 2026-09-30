@@ -1,3 +1,13 @@
 # Tic-Tac-Toe
-Welcome to the ultimate cosmic showdown! This space-themed Tic-Tac-Toe game takes the classic strategy grid and launches it into deep space with a sleek, modern aesthetic. Set against a dark, cool-toned galaxy, you'll play as glowing neon tokens accompanied by smooth canvas animations, realistic moving comets with icy gas tails, and beautifully shaded 3D planets drifting across your viewport. Featuring an electric flickering neon title and a smart AI opponent, every match feels like an arcade-style battle for interstellar dominance. In today's world, Every human has their own problems and worries. There are many people who are stressed due to this problems. I wanted to give them a relief from their reality and problems, so I decided to create a website which gives you some relief. This is my Tic Tac Toe website where you can play Tic Tac Toe with a computer!
-Whether you're looking for a quick strategy break or an engaging showcase of HTML5 Canvas power, this single-file web app delivers a rich, interactive experience. Complete with responsive game logic, smooth state resets, custom victory announcements, and celebratory emoji explosions, it combines fast-paced gameplay with a captivating sci-fi atmosphere. Step up to the grid, test your tactics against the computer, and claim your place among the stars!
+A Tic Tac Toe game website built for stress relief and entertainment. 
+Features:
+- Deep Space Visuals: Animated background featuring 3D-shaded orbiting planets with atmospheric glow, trailing comets, and twinkling stars.
+- Neon Arcade Styling: Vibrant glowing game grid and an electric flickering title.
+- AI Opponent & Difficulty Modes:
+  - Easy: Plays quick random moves.
+  - Hard: Uses smart tactical logic (wins, blocks player winning moves, and controls key positions).
+- Particle & Emoji Bursts: Dynamic canvas-rendered particle bursts for Win, Loss, and Draw outcomes.
+- Fully Responsive: Adapts cleanly across desktop, tablet, and mobile screens.
+Build with:
+HTML, CSS and JAVA Script
+Dive into a world of Entertainment!
