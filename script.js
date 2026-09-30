@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     [0, 4, 8], [2, 4, 6]
   ];
 
-  // --- Faster Canvas Emoji Burst ---
   function launchCanvasEmojiBurst(emojiList) {
     const canvas = document.getElementById("spaceCanvas");
     if (!canvas) return;
@@ -83,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
     launchCanvasEmojiBurst(["🤝", "😐", "⚔️", "⚖️", "🤔", "🤷"]);
   }
 
-  // --- Background Comets (No Sun) ---
   const canvas = document.getElementById("spaceCanvas");
   if (canvas) {
     const ctx = canvas.getContext("2d");
@@ -284,3 +282,94 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+const playerScoreEl = document.getElementById('playerScore');
+const drawScoreEl = document.getElementById('drawScore');
+const botScoreEl = document.getElementById('botScore');
+const difficultySelect = document.getElementById('difficulty');
+const resetScoresBtn = document.getElementById('resetScoresBtn');
+
+// --- Score State (persisted via localStorage) ---
+let scores = JSON.parse(localStorage.getItem('tictactoe_scores')) || { player: 0, draw: 0, bot: 0 };
+
+function updateScoreDisplay() {
+  playerScoreEl.textContent = scores.player;
+  drawScoreEl.textContent = scores.draw;
+  botScoreEl.textContent = scores.bot;
+  localStorage.setItem('tictactoe_scores', JSON.stringify(scores));
+}
+
+// Initialize scores on load
+updateScoreDisplay();
+
+// Reset Scores Handler
+if (resetScoresBtn) {
+  resetScoresBtn.addEventListener('click', () => {
+    scores = { player: 0, draw: 0, bot: 0 };
+    updateScoreDisplay();
+  });
+}
+
+// --- Computer AI Decision ---
+function botTurn() {
+  const emptyIndices = board
+    .map((val, idx) => (val === "" ? idx : null))
+    .filter((val) => val !== null);
+
+  if (emptyIndices.length === 0 || !isGameActive) return;
+
+  const difficulty = difficultySelect ? difficultySelect.value : 'easy';
+  let move;
+
+  if (difficulty === 'easy') {
+    // Random move
+    move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  } else {
+    // Smart move: 1. Try to win, 2. Block player, 3. Take center/corner, 4. Random
+    move = findBestMove('O'); // Check if bot can win
+    if (move === -1) move = findBestMove('X'); // Check if player needs blocking
+    if (move === -1 && board[4] === "") move = 4; // Take center
+    if (move === -1) {
+      const corners = [0, 2, 6, 8].filter(i => board[i] === "");
+      if (corners.length > 0) move = corners[Math.floor(Math.random() * corners.length)];
+    }
+    if (move === -1) move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  }
+
+  makeMove(move, "O");
+}
+
+// Helper to find immediate win or block opportunity
+function findBestMove(playerSymbol) {
+  for (let i = 0; i < winPatterns.length; i++) {
+    const [a, b, c] = winPatterns[i];
+    const line = [board[a], board[b], board[c]];
+    if (line.filter(val => val === playerSymbol).length === 2 && line.includes("")) {
+      if (board[a] === "") return a;
+      if (board[b] === "") return b;
+      if (board[c] === "") return c;
+    }
+  }
+  return -1;
+}
+
+// --- Update Result Handler to modify scores ---
+function showResult(text, outcome) {
+  if (statusText) statusText.textContent = text;
+  if (modal) {
+    modal.style.display = "flex";
+    modal.classList.add("show");
+  }
+
+  if (outcome === "X") {
+    scores.player++;
+    popEmojis(["🥳", "🎉", "⭐", "🔥"]);
+  } else if (outcome === "O") {
+    scores.bot++;
+    popEmojis(["😢", "😭", "💔"]);
+  } else {
+    scores.draw++;
+    popEmojis(["🤝", "⚖️", "🤔"]);
+  }
+
+  updateScoreDisplay();
+}
