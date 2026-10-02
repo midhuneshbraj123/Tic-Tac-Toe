@@ -11,4 +11,5 @@ Build with:
 - HTML - Contains the basic HTML layout and game elements.
 - CSS - Handles basic styling, grid layout, and background color.
 - Script Java - Contains the core game rules, click listeners, and bot logic.
+
 Dive into a world of Entertainment!
