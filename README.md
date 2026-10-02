@@ -1,13 +1,12 @@
 # Tic-Tac-Toe
-A Tic Tac Toe game website built for stress relief and entertainment. 
+A Tic Tac Toe game website built for stress relief and entertainment. A simple, lightweight Tic-Tac-Toe web application built with vanilla HTML, CSS, and JavaScript.
 Features:
-- Deep Space Visuals: Animated background featuring 3D-shaded orbiting planets with atmospheric glow, trailing comets, and twinkling stars.
-- Neon Arcade Styling: Vibrant glowing game grid and an electric flickering title.
-- AI Opponent & Difficulty Modes:
-  - Easy: Plays quick random moves.
-  - Hard: Uses smart tactical logic (wins, blocks player winning moves, and controls key positions).
-- Particle & Emoji Bursts: Dynamic canvas-rendered particle bursts for Win, Loss, and Draw outcomes.
-- Fully Responsive: Adapts cleanly across desktop, tablet, and mobile screens.
+- Classic 3x3 Tic-Tac-Toe grid.
+- Single-player mode against a hard-difficulty bot.
+- Simple status display for wins, losses, and draws.
+- "Play Again" button to restart the game state immediately.
 Build with:
-HTML, CSS and JAVA Script
+- HTML - Contains the basic HTML layout and game elements.
+- CSS - Handles basic styling, grid layout, and background color.
+- Script Java - Contains the core game rules, click listeners, and bot logic.
 Dive into a world of Entertainment!
