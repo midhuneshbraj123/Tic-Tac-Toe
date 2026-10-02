@@ -1,37 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic Tac Toe</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1 class="neon-title">Tic Tac Toe</h1>
-
-  <div class="controls">
-    <label for="difficulty">Level: </label>
-    <select id="difficulty">
-      <option value="easy">Easy</option>
-      <option value="hard">Hard</option>
-    </select>
+  <div id="game-box">
+    <button class="sq" id="s0"></button>
+    <button class="sq" id="s1"></button>
+    <button class="sq" id="s2"></button>
+    <button class="sq" id="s3"></button>
+    <button class="sq" id="s4"></button>
+    <button class="sq" id="s5"></button>
+    <button class="sq" id="s6"></button>
+    <button class="sq" id="s7"></button>
+    <button class="sq" id="s8"></button>
   </div>
 
-  <div class="board">
-    <button class="cell" data-index="0"></button>
-    <button class="cell" data-index="1"></button>
-    <button class="cell" data-index="2"></button>
-    <button class="cell" data-index="3"></button>
-    <button class="cell" data-index="4"></button>
-    <button class="cell" data-index="5"></button>
-    <button class="cell" data-index="6"></button>
-    <button class="cell" data-index="7"></button>
-    <button class="cell" data-index="8"></button>
-  </div>
-
-  <h2 id="status"></h2>
-  <button id="resetBtn" type="button">Play Again</button>
+  <div id="msg"></div>
+  <button id="reset">Play Again</button>
 
   <script src="script.js"></script>
 </body>
