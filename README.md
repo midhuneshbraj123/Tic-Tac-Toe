@@ -1,4 +1,3 @@
-<img width="1917" height="1077" alt="Devlog 6" src="https://github.com/user-attachments/assets/6e283933-f1ff-45b6-9fa7-1d3856b9487f" />
 # Tic-Tac-Toe
 A Tic Tac Toe game website built for stress relief and entertainment. A simple, lightweight Tic-Tac-Toe web application built with HTML, CSS, and JavaScript.
 
@@ -14,3 +13,5 @@ Build with:
 - Script Java - Contains the core game rules, click listeners, and bot logic.
 
 Dive into a world of Entertainment!
+
+<img width="1917" height="1077" alt="Devlog 6" src="https://github.com/user-attachments/assets/6e283933-f1ff-45b6-9fa7-1d3856b9487f" />
