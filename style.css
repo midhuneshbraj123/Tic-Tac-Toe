@@ -1,37 +1,20 @@
-body{
-  background:#111;
-  color:#fff;
-  font-family:sans-serif;
-  text-align:center;
-  margin-top:50px;
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin-top: 50px;
 }
 
-#game-box{
-  width:270px;
-  height:270px;
-  margin:0 auto;
+button {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 4px;
+    cursor: pointer;
 }
 
-.sq{
-  width:80px;
-  height:80px;
-  float:left;
-  margin:5px;
-  background:#222;
-  border:1px solid #555;
-  font-size:2rem;
-  color:#fff;
-  cursor:pointer;
-}
-
-#msg{
-  margin:20px;
-  font-size:1.2rem;
-  height:25px;
-}
-
-#reset{
-  padding:8px 16px;
-  font-size:1rem;
-  cursor:pointer;
+#message {
+    font-size: 20px;
+    font-weight: bold;
 }
