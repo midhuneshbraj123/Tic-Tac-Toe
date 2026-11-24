@@ -1,27 +1,26 @@
-<!DOCTYPE html>
 <html>
 <head>
-    <title>My Tic Tac Toe Game</title>
+    <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>Tic Tac Toe vs Bot</h1>
-    
-    <div id="game-board">
-        <button onclick="clickBox(0)" id="b0"></button>
-        <button onclick="clickBox(1)" id="b1"></button>
-        <button onclick="clickBox(2)" id="b2"></button><br>
-        <button onclick="clickBox(3)" id="b3"></button>
-        <button onclick="clickBox(4)" id="b4"></button>
-        <button onclick="clickBox(5)" id="b5"></button><br>
-        <button onclick="clickBox(6)" id="b6"></button>
-        <button onclick="clickBox(7)" id="b7"></button>
-        <button onclick="clickBox(8)" id="b8"></button>
-    </div>
+    <h1>Tic Tac Toe</h1>
 
-    <p id="message">Your turn (X)</p>
-    <button onclick="restartGame()">Start Over</button>
+    <button id="box1" onclick="play(1)"></button>
+    <button id="box2" onclick="play(2)"></button>
+    <button id="box3" onclick="play(3)"></button>
+    <br>
+    <button id="box4" onclick="play(4)"></button>
+    <button id="box5" onclick="play(5)"></button>
+    <button id="box6" onclick="play(6)"></button>
+    <br>
+    <button id="box7" onclick="play(7)"></button>
+    <button id="box8" onclick="play(8)"></button>
+    <button id="box9" onclick="play(9)"></button>
+
+    <p id="status">Your turn</p>
+    <button id="reset" onclick="resetGame()">Reset</button>
 
     <script src="script.js"></script>
 </body>
