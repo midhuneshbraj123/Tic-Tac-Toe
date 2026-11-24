@@ -1,82 +1,86 @@
-var player = "X"; // X is you, O is the bot
-var spaces = ["", "", "", "", "", "", "", "", ""];
-var ended = false;
+var gameOver = false;
 
-function clickBox(num) {
-    if (spaces[num] === "" && ended === false && player === "X") {
-        spaces[num] = "X";
-        document.getElementById("b" + num).innerText = "X";
-        
-        checkWinner();
+function play(boxNumber) {
+    var clickedBox = document.getElementById("box" + boxNumber);
 
-        if (ended === false) {
-            player = "O";
-            document.getElementById("message").innerText = "Bot is thinking...";
-            setTimeout(botMove, 500);
+    if (clickedBox.innerText == "" && gameOver == false) {
+        clickedBox.innerText = "X";
+        checkWin();
+
+        if (gameOver == false) {
+            botTurn();
+            checkWin();
         }
     }
 }
 
-function botMove() {
-    if (ended === true) return;
-
-    var emptySpots = [];
-    for (var i = 0; i < 9; i++) {
-        if (spaces[i] === "") {
-            emptySpots.push(i);
-        }
-    }
-
-    if (emptySpots.length > 0) {
-        var randomIndex = Math.floor(Math.random() * emptySpots.length);
-        var spot = emptySpots[randomIndex];
-
-        spaces[spot] = "O";
-        document.getElementById("b" + spot).innerText = "O";
-
-        checkWinner();
-
-        if (ended === false) {
-            player = "X";
-            document.getElementById("message").innerText = "Your turn (X)";
-        }
+function botTurn() {
+    if (document.getElementById("box1").innerText == "") {
+        document.getElementById("box1").innerText = "O";
+    } else if (document.getElementById("box2").innerText == "") {
+        document.getElementById("box2").innerText = "O";
+    } else if (document.getElementById("box3").innerText == "") {
+        document.getElementById("box3").innerText = "O";
+    } else if (document.getElementById("box4").innerText == "") {
+        document.getElementById("box4").innerText = "O";
+    } else if (document.getElementById("box5").innerText == "") {
+        document.getElementById("box5").innerText = "O";
+    } else if (document.getElementById("box6").innerText == "") {
+        document.getElementById("box6").innerText = "O";
+    } else if (document.getElementById("box7").innerText == "") {
+        document.getElementById("box7").innerText = "O";
+    } else if (document.getElementById("box8").innerText == "") {
+        document.getElementById("box8").innerText = "O";
+    } else if (document.getElementById("box9").innerText == "") {
+        document.getElementById("box9").innerText = "O";
     }
 }
 
-function checkWinner() {
-    if (spaces[0] !== "" && spaces[0] === spaces[1] && spaces[1] === spaces[2]) { alert(spaces[0] + " Wins!"); ended = true; }
-    else if (spaces[3] !== "" && spaces[3] === spaces[4] && spaces[4] === spaces[5]) { alert(spaces[3] + " Wins!"); ended = true; }
-    else if (spaces[6] !== "" && spaces[6] === spaces[7] && spaces[7] === spaces[8]) { alert(spaces[6] + " Wins!"); ended = true; }
+function checkWin() {
+    var b1 = document.getElementById("box1").innerText;
+    var b2 = document.getElementById("box2").innerText;
+    var b3 = document.getElementById("box3").innerText;
+    var b4 = document.getElementById("box4").innerText;
+    var b5 = document.getElementById("box5").innerText;
+    var b6 = document.getElementById("box6").innerText;
+    var b7 = document.getElementById("box7").innerText;
+    var b8 = document.getElementById("box8").innerText;
+    var b9 = document.getElementById("box9").innerText;
 
-    else if (spaces[0] !== "" && spaces[0] === spaces[3] && spaces[3] === spaces[6]) { alert(spaces[0] + " Wins!"); ended = true; }
-    else if (spaces[1] !== "" && spaces[1] === spaces[4] && spaces[4] === spaces[7]) { alert(spaces[1] + " Wins!"); ended = true; }
-    else if (spaces[2] !== "" && spaces[2] === spaces[5] && spaces[5] === spaces[8]) { alert(spaces[2] + " Wins!"); ended = true; }
+    if (b1 == "X" && b2 == "X" && b3 == "X") { win("You win!"); }
+    if (b4 == "X" && b5 == "X" && b6 == "X") { win("You win!"); }
+    if (b7 == "X" && b8 == "X" && b9 == "X") { win("You win!"); }
+    if (b1 == "X" && b4 == "X" && b7 == "X") { win("You win!"); }
+    if (b2 == "X" && b5 == "X" && b8 == "X") { win("You win!"); }
+    if (b3 == "X" && b6 == "X" && b9 == "X") { win("You win!"); }
+    if (b1 == "X" && b5 == "X" && b9 == "X") { win("You win!"); }
+    if (b3 == "X" && b5 == "X" && b7 == "X") { win("You win!"); }
 
-    else if (spaces[0] !== "" && spaces[0] === spaces[4] && spaces[4] === spaces[8]) { alert(spaces[0] + " Wins!"); ended = true; }
-    else if (spaces[2] !== "" && spaces[2] === spaces[4] && spaces[4] === spaces[6]) { alert(spaces[2] + " Wins!"); ended = true; }
-    
-    else {
-        var tie = true;
-        for (var i = 0; i < 9; i++) {
-            if (spaces[i] === "") {
-                tie = false;
-            }
-        }
-        if (tie === true && ended === false) {
-            alert("It's a Tie!");
-            ended = true;
-        }
-    }
+    if (b1 == "O" && b2 == "O" && b3 == "O") { win("Bot wins!"); }
+    if (b4 == "O" && b5 == "O" && b6 == "O") { win("Bot wins!"); }
+    if (b7 == "O" && b8 == "O" && b9 == "O") { win("Bot wins!"); }
+    if (b1 == "O" && b4 == "O" && b7 == "O") { win("Bot wins!"); }
+    if (b2 == "O" && b5 == "O" && b8 == "O") { win("Bot wins!"); }
+    if (b3 == "O" && b6 == "O" && b9 == "O") { win("Bot wins!"); }
+    if (b1 == "O" && b5 == "O" && b9 == "O") { win("Bot wins!"); }
+    if (b3 == "O" && b5 == "O" && b7 == "O") { win("Bot wins!"); }
 }
 
-function restartGame() {
-    player = "X";
-    spaces = ["", "", "", "", "", "", "", "", ""];
-    ended = false;
-    
-    for (var i = 0; i < 9; i++) {
-        document.getElementById("b" + i).innerText = "";
-    }
-    
-    document.getElementById("message").innerText = "Your turn (X)";
+function win(message) {
+    document.getElementById("status").innerText = message;
+    gameOver = true;
+}
+
+function resetGame() {
+    document.getElementById("box1").innerText = "";
+    document.getElementById("box2").innerText = "";
+    document.getElementById("box3").innerText = "";
+    document.getElementById("box4").innerText = "";
+    document.getElementById("box5").innerText = "";
+    document.getElementById("box6").innerText = "";
+    document.getElementById("box7").innerText = "";
+    document.getElementById("box8").innerText = "";
+    document.getElementById("box9").innerText = "";
+    document.getElementById("status").innerText = "Your turn";
+    gameOver = false;
 }
